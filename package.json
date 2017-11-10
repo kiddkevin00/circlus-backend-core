@@ -1,0 +1,110 @@
+{
+  "name": "circlus-backend-core",
+  "version": "0.0.1",
+  "description": "A generic RESTful API backend.",
+  "main": "./src/lib/app.js",
+  "bin": {
+    "update-test-coverage": "./bin/update-test-coverage.js",
+    "version-bump": "./bin/version-bump.js",
+    "restrict-branches-no-push": "./bin/restrict-branches-no-push.sh"
+  },
+  "config": {
+    "ip": "0.0.0.0",
+    "port": 8087
+  },
+  "nyc": {
+    "statements": 0,
+    "branches": 0,
+    "functions": 0,
+    "lines": 0,
+    "excludes": [
+      "**/*.spec.js"
+    ],
+    "include": [
+      "src/lib/**"
+    ],
+    "report-dir": "./spec/coverage"
+  },
+  "scripts": {
+    "------------- EXPOSED -------------": "",
+    "start": "node --stack-size=65500 src/lib/app.js",
+    "start-prod": "node --stack-size=65500 src/lib/app.js",
+    "lint": "npm run eslint",
+    "unit-test": "cat src/spec/support/run_all_the_tests.txt; npm run mocha-unit-test",
+    "integration-test": "",
+    "precommit": "npm run lint && npm run coverage:unit-test",
+    "prepush": "npm run branch-check && npm run lint && npm run coverage:unit-test && npm run coverage:update-thresholds",
+    "version:bump": "npm run version:instruction && ./bin/version-bump.js",
+    "------------- INTERNAL ------------": "",
+    "eslint": "eslint --format 'node_modules/eslint-friendly-formatter' src/ examples/ bin/ scripts/",
+    "jasmine-unit-test": "node src/spec/support/jasmine-test-runner.js -- -t unit",
+    "mocha-unit-test": "multi='tap=- xunit=spec/reports/xunit.xml' mocha --opts mocha.opts --reporter mocha-multi | faucet",
+    "coverage:unit-test": "nyc --check-coverage --all --preload-sources --reporter cobertura --reporter html mocha --opts mocha.opts",
+    "coverage:integration-test": "",
+    "coverage:update-thresholds": "echo 'disable `coverage:update-thresholds` for now' || ./bin/update-test-coverage.js",
+    "branch-check": "./bin/restrict-branches-to-push.sh",
+    "version:instruction": "echo 'Please specify full version number after `npm run version:bump`.  E.g. $ npm run version:bump 0.0.1'",
+    "------------- LOCAL DEV -----------": "",
+    "local-unit-test": "mocha --opts mocha.opts --bail",
+    "local-integration-test": "",
+    "coverage:report": "nyc report",
+    "coverage:html-report": "open spec/coverage/index.html",
+    "dev:start": "nodemon --watch src/",
+    "dev:watch": "watch 'npm run lint' src/",
+    "dev:performance": "nodemon --perf_basic_prof --debug --trace_gc",
+    "debug": "node --debug --debug-brk src/lib/app.js"
+  },
+  "engines": {
+    "node": "6.11.1",
+    "npm": ">=3.10.9"
+  },
+  "dependencies": {
+    "bluebird": "^3.4.6",
+    "body-parser": "^1.15.2",
+    "compression": "^1.6.2",
+    "cookie-parser": "^1.4.3",
+    "cors": "^2.8.1",
+    "errorhandler": "^1.4.3",
+    "express": "^4.14.0",
+    "jade": "^1.11.0",
+    "jsonwebtoken": "^7.2.1",
+    "method-override": "^2.3.6",
+    "morgan": "^1.7.0",
+    "nodemailer": "^0.7.1",
+    "nodemailer-smtp-transport": "^2.7.2",
+    "serve-favicon": "^2.3.2",
+    "stripe": "^4.15.0"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "chai-as-promised": "^5.3.0",
+    "chai-shallow-deep-equal": "^1.4.0",
+    "eslint": "3.19.0",
+    "eslint-config-airbnb": "15.0.1",
+    "eslint-config-standard-react": "5.0.0",
+    "eslint-friendly-formatter": "2.0.7",
+    "eslint-plugin-chai-expect": "1.1.1",
+    "eslint-plugin-import": "2.3.0",
+    "eslint-plugin-jsx-a11y": "5.0.3",
+    "eslint-plugin-react": "7.0.1",
+    "faucet": "0.0.1",
+    "husky": "^0.11.9",
+    "jasmine": "^2.4.1",
+    "jasmine-reporters": "^2.1.1",
+    "mocha": "^3.4.2",
+    "mocha-multi": "^0.9.0",
+    "nodemon": "^1.11.0",
+    "nyc": "^8.3.1",
+    "sinon": "^1.17.4",
+    "sinon-as-promised": "^4.0.0",
+    "sinon-chai": "^2.8.0",
+    "watch": "^0.19.1"
+  },
+  "author": "Marcus Hsu",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:kiddkevin00/circlus-backend-core.git"
+  },
+  "private": true
+}
