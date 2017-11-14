@@ -48,13 +48,13 @@ class PaymentController {
         customerId = customer.id;
 
         return stripe.charges.create({
-          description: `Charge for customer ${state.customerId}`,
+          description: `Charge for customer ${customerId}`,
           customer: customerId,
           amount: state.chargeAmount * 100,
           currency: 'usd',
         });
       })
-      .then((charge) => {
+      .then(() => {
         //const newJwtPayload = Object.assign({}, req.user, partialNewUserInfo, {
         //  sub: `${partialNewUserInfo.type}:${req.user.email}:${req.user._id}`,
         //});
@@ -77,7 +77,6 @@ class PaymentController {
             success: true,
             detail: {
               customerId,
-              charge,
             },
           },
         ], constants.SYSTEM.RESPONSE_NAMES.PAYMENT);
