@@ -17,9 +17,9 @@ const jwtNotBefore = constants.CREDENTIAL.JWT.NOT_BEFORE;
 const containerId = process.env.HOSTNAME;
 let requestCount = 0;
 
-class PaymentController {
+class BankAccountController {
 
-  static proceed(req, res) {
+  static setup(req, res) {
     requestCount += 1;
 
     const email = req.body.email;
@@ -120,4 +120,4 @@ class PaymentController {
 
 }
 
-module.exports = exports = PaymentController;
+module.exports = exports = BankAccountController;

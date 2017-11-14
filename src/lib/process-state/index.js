@@ -7,6 +7,8 @@ class ProcessState {
 
     this[stateContext].context = { containerId, requestCount };
     this[stateContext].email = options.email;
+    this[stateContext].tokenId = options.tokenId;
+    this[stateContext].chargeAmount = options.chargeAmount;
   }
 
   get context() {
@@ -17,6 +19,13 @@ class ProcessState {
     return this[stateContext].email;
   }
 
+  get tokenId() {
+    return this[stateContext].tokenId;
+  }
+
+  get chargeAmount() {
+    return this[stateContext].chargeAmount;
+  }
 
   static create(options, context) {
     return new ProcessState(options, context);

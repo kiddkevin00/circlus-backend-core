@@ -3,6 +3,7 @@
  */
 
 const paymentRoutes = require('./payment/');
+const bankAccountRoutes = require('./bank-account/');
 const authCheckMiddleware = require('../utils/auth-check-middleware');
 const constants = require('../constants/');
 const packageJson = require('../../../package.json');
@@ -58,7 +59,13 @@ function setupRoutes(app) {
 function setupApiRoutes() {
   const router = Router();
 
-  router.use('/payment', [authCheckMiddleware], paymentRoutes);
+  router.use('/payment',
+    //[authCheckMiddleware],
+    paymentRoutes);
+
+  router.use('/bank-account',
+    //[authCheckMiddleware],
+    bankAccountRoutes);
 
   return router;
 }
