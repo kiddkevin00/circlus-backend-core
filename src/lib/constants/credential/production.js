@@ -13,5 +13,5 @@ exports.JWT = {
 };
 
 exports.STRIPE = {
-  PRIVATE_KEY: 'sk_live_QgxbESIIxtkIfbprJvWPCOch',
+  PRIVATE_KEY: 'sk_test_QgxbESIIxtkIfbprJvWPCOch',
 };
