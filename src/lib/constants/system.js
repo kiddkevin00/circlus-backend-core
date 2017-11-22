@@ -50,4 +50,5 @@ exports.ERROR_MSG = {
 
 exports.RESPONSE_NAMES = {
   PAYMENT: 'PAYMENT',
+  BANK_ACCOUNT: 'BANK_ACCOUNT'
 };

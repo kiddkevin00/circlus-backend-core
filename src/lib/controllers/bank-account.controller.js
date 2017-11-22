@@ -6,6 +6,7 @@ const constants = require('../constants/');
 const stripeApi = require('stripe');
 const jwt = require('jsonwebtoken');
 const Promise = require('bluebird');
+const rp = require('request-promise');
 
 
 const stripe = stripeApi(constants.CREDENTIAL.STRIPE.PRIVATE_KEY);
@@ -20,74 +21,40 @@ let requestCount = 0;
 class BankAccountController {
 
   static setup(req, res) {
-    requestCount += 1;
+    const stripeCode = req.body.stripeCode;
 
-    const email = req.body.email;
-    const tokenId = req.body.tokenId;
-    const chargeAmount = req.body.chargeAmount;
-
-    Validator.shouldNotBeEmpty(email);
-    Validator.shouldNotBeEmpty(tokenId);
-    Validator.shouldNotBeEmpty(chargeAmount);
-
-    const options = { email, tokenId, chargeAmount };
-    const context = { containerId, requestCount };
-    const state = ProcessSate.create(options, context);
-    let customerId;
+    Validator.shouldNotBeEmpty(stripeCode);
+    const data = {
+      client_secret: 'sk_test_QgxbESIIxtkIfbprJvWPCOch',
+      code: stripeCode,
+      grant_type: 'authorization_code'
+    }
+    const options = {
+      uri: 'https://connect.stripe.com/oauth/token',
+      method: 'POST',
+      json: true,
+      body: data
+    };
 
     return Promise
       .try(() => {
-        return stripe.customers.create({
-          description: `Customer for ${state.email} - ${state.tokenId}`,
-          account_balance: 0,
-          email: state.email,
-          source: state.tokenId,
-        });
+        return rp(options)
       })
-      .then((customer) => {
-        customerId = customer.id;
-
-        return stripe.charges.create({
-          description: `Charge for customer ${state.customerId}`,
-          customer: customerId,
-          amount: state.chargeAmount * 100,
-          currency: 'usd',
-        });
-      })
-      .then((charge) => {
-        //const newJwtPayload = Object.assign({}, req.user, partialNewUserInfo, {
-        //  sub: `${partialNewUserInfo.type}:${req.user.email}:${req.user._id}`,
-        //});
-        //const jwtToken = jwt.sign(newJwtPayload, jwtSecret, {
-        //  expiresIn: jwtExpiresIn,
-        //  notBefore: jwtNotBefore,
-        //  issuer: jwtIssuer,
-        //  audience: jwtAudience,
-        //});
-        //
-        //res.cookie(constants.CREDENTIAL.JWT.COOKIE_NAME, jwtToken, {
-        //  httpOnly: constants.CREDENTIAL.JWT.COOKIE_HTTP_ONLY,
-        //  secure: constants.CREDENTIAL.JWT.COOKIE_SECURE,
-        //  path: constants.CREDENTIAL.JWT.COOKIE_PATH,
-        //  signed: constants.CREDENTIAL.JWT.COOKIE_SIGNED,
-        //});
-
+      .then((parsedBody) => {
         const response = new StandardResponseWrapper([
           {
             success: true,
             detail: {
-              customerId,
-              charge,
+              stripeUserId: parsedBody.stripe_user_id,
             },
           },
-        ], constants.SYSTEM.RESPONSE_NAMES.PAYMENT);
+        ], constants.SYSTEM.RESPONSE_NAMES.BANK_ACCOUNT);
 
         return res.status(constants.SYSTEM.HTTP_STATUS_CODES.OK)
           .json(response.format);
       })
       .catch((_err) => {
-        console.log(_err);
-
+        // TODO: use correct error state
         const err = new StandardErrorWrapper(_err);
 
         err.append({
@@ -102,8 +69,7 @@ class BankAccountController {
             success: false,
             status: err.getNthError(0).name,
             detail: err.format({
-              containerId: state.context.containerId,
-              requestCount: state.context.requestCount,
+              containerId: 'dd',
             }),
           },
         ], constants.SYSTEM.RESPONSE_NAMES.PAYMENT);
