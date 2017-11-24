@@ -231,7 +231,7 @@ $RECYCLE.BIN/
 
 # local NPM config files
 /npmrc
-/.npmrc
+#/.npmrc
 
 # build files
 /dist/

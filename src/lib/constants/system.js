@@ -40,15 +40,17 @@ exports.ERROR_NAMES = {
   RESPONSE_OBJ_PARSE_ERROR: 'RESPONSE_OBJ_PARSE_ERROR',
   ERROR_OBJ_PARSE_ERROR: 'RESPONSE_OBJ_PARSE_ERROR',
   CAUGHT_ERROR_IN_PAYMENT_CONTROLLER: 'CAUGHT_ERROR_IN_PAYMENT_CONTROLLER',
+  CAUGHT_ERROR_IN_BANK_ACCOUNT_CONTROLLER: 'CAUGHT_ERROR_IN_BANK_ACCOUNT_CONTROLLER',
 };
 
 exports.ERROR_MSG = {
   RESPONSE_OBJ_PARSE_ERROR: 'The response object is not able to deserialize back to an instance of Standard Response Wrapper.',
   ERROR_OBJ_PARSE_ERROR: 'The error object is not able to deserialize back to an instance of Standard Error Wrapper.',
   CAUGHT_ERROR_IN_PAYMENT_CONTROLLER: 'There is an error being caught in Payment Controller.',
+  CAUGHT_ERROR_IN_BANK_ACCOUNT_CONTROLLER: 'There is an error being caught in Bank Account Controller.',
 };
 
 exports.RESPONSE_NAMES = {
-  PAYMENT: 'PAYMENT',
-  BANK_ACCOUNT: 'BANK_ACCOUNT'
+  PROCESS_PAYMENT: 'PROCESS_PAYMENT',
+  SETUP_BANK_ACCOUNT: 'SETUP_BANK_ACCOUNT',
 };

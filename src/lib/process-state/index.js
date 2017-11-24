@@ -9,6 +9,7 @@ class ProcessState {
     this[stateContext].email = options.email;
     this[stateContext].tokenId = options.tokenId;
     this[stateContext].chargeAmount = options.chargeAmount;
+    this[stateContext].authorizationCode = options.authorizationCode;
   }
 
   get context() {
@@ -25,6 +26,10 @@ class ProcessState {
 
   get chargeAmount() {
     return this[stateContext].chargeAmount;
+  }
+
+  get authorizationCode() {
+    return this[stateContext].authorizationCode;
   }
 
   static create(options, context) {

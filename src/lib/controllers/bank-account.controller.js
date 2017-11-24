@@ -21,24 +21,31 @@ let requestCount = 0;
 class BankAccountController {
 
   static setup(req, res) {
-    const stripeCode = req.body.stripeCode;
+    requestCount += 1;
 
-    Validator.shouldNotBeEmpty(stripeCode);
-    const data = {
-      client_secret: 'sk_test_QgxbESIIxtkIfbprJvWPCOch',
-      code: stripeCode,
-      grant_type: 'authorization_code'
-    }
-    const options = {
-      uri: 'https://connect.stripe.com/oauth/token',
-      method: 'POST',
-      json: true,
-      body: data
-    };
+    const authorizationCode = req.body.authorizationCode;
+
+    Validator.shouldNotBeEmpty(authorizationCode);
+
+    const options = { authorizationCode };
+    const context = { containerId, requestCount };
+    const state = ProcessSate.create(options, context);
 
     return Promise
       .try(() => {
-        return rp(options)
+        const body = {
+          code: state.authorizationCode,
+          client_secret: 'sk_test_QgxbESIIxtkIfbprJvWPCOch',
+          grant_type: 'authorization_code',
+        };
+        const rpOptions = {
+          body,
+          uri: 'https://connect.stripe.com/oauth/token',
+          method: 'POST',
+          json: true,
+        };
+
+        return rp(rpOptions);
       })
       .then((parsedBody) => {
         const response = new StandardResponseWrapper([
@@ -48,20 +55,19 @@ class BankAccountController {
               stripeUserId: parsedBody.stripe_user_id,
             },
           },
-        ], constants.SYSTEM.RESPONSE_NAMES.BANK_ACCOUNT);
+        ], constants.SYSTEM.RESPONSE_NAMES.SETUP_BANK_ACCOUNT);
 
         return res.status(constants.SYSTEM.HTTP_STATUS_CODES.OK)
           .json(response.format);
       })
       .catch((_err) => {
-        // TODO: use correct error state
         const err = new StandardErrorWrapper(_err);
 
         err.append({
           code: constants.SYSTEM.ERROR_CODES.INTERNAL_SERVER_ERROR,
-          name: constants.SYSTEM.ERROR_NAMES.CAUGHT_ERROR_IN_PAYMENT_CONTROLLER,
+          name: constants.SYSTEM.ERROR_NAMES.CAUGHT_ERROR_IN_BANK_ACCOUNT_CONTROLLER,
           source: constants.SYSTEM.COMMON.CURRENT_SOURCE,
-          message: constants.SYSTEM.ERROR_MSG.CAUGHT_ERROR_IN_PAYMENT_CONTROLLER,
+          message: constants.SYSTEM.ERROR_MSG.CAUGHT_ERROR_IN_BANK_ACCOUNT_CONTROLLER,
         });
 
         const response = new StandardResponseWrapper([
@@ -69,10 +75,11 @@ class BankAccountController {
             success: false,
             status: err.getNthError(0).name,
             detail: err.format({
-              containerId: 'dd',
+              containerId: state.context.containerId,
+              requestCount: state.context.requestCount,
             }),
           },
-        ], constants.SYSTEM.RESPONSE_NAMES.PAYMENT);
+        ], constants.SYSTEM.RESPONSE_NAMES.SETUP_BANK_ACCOUNT);
 
         return res.status(constants.SYSTEM.HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR)
           .json(response.format);

@@ -49,9 +49,16 @@ class PaymentController {
 
         return stripe.charges.create({
           description: `Charge for customer ${customerId}`,
+          statement_descriptor: 'Circlus, Inc.',
           customer: customerId,
           amount: state.chargeAmount * 100,
           currency: 'usd',
+          //destination: {
+          //  // Send $80 to the seller after collecting a 20% platform fee.
+          //  amount: 8000,
+          //  // The destination of this charge is the seller's Stripe account.
+          //  account: SOME_ACCOUNT_ID,
+          //}
         });
       })
       .then(() => {
@@ -79,14 +86,12 @@ class PaymentController {
               customerId,
             },
           },
-        ], constants.SYSTEM.RESPONSE_NAMES.PAYMENT);
+        ], constants.SYSTEM.RESPONSE_NAMES.PROCESS_PAYMENT);
 
         return res.status(constants.SYSTEM.HTTP_STATUS_CODES.OK)
           .json(response.format);
       })
       .catch((_err) => {
-        console.log(_err);
-
         const err = new StandardErrorWrapper(_err);
 
         err.append({
@@ -105,7 +110,7 @@ class PaymentController {
               requestCount: state.context.requestCount,
             }),
           },
-        ], constants.SYSTEM.RESPONSE_NAMES.PAYMENT);
+        ], constants.SYSTEM.RESPONSE_NAMES.PROCESS_PAYMENT);
 
         return res.status(constants.SYSTEM.HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR)
           .json(response.format);
