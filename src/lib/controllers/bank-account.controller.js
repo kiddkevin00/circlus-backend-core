@@ -74,6 +74,7 @@ class BankAccountController {
           {
             success: false,
             status: err.getNthError(0).name,
+            message: err.getNthError(0).message,
             detail: err.format({
               containerId: state.context.containerId,
               requestCount: state.context.requestCount,

@@ -51,7 +51,7 @@ class PaymentController {
           description: `Charge for customer ${customerId}`,
           statement_descriptor: 'Circlus, Inc.',
           customer: customerId,
-          amount: state.chargeAmount * 100,
+          amount: Number((state.chargeAmount * 100).toFixed(2)),
           currency: 'usd',
           //destination: {
           //  // Send $80 to the seller after collecting a 20% platform fee.
@@ -105,6 +105,7 @@ class PaymentController {
           {
             success: false,
             status: err.getNthError(0).name,
+            message: err.getNthError(0).message,
             detail: err.format({
               containerId: state.context.containerId,
               requestCount: state.context.requestCount,
