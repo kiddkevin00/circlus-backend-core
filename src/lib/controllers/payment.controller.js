@@ -25,10 +25,17 @@ class PaymentController {
     const email = req.body.email;
     const tokenId = req.body.tokenId;
     const chargeAmount = req.body.chargeAmount;
+    const dealId = req.body.dealId;
+    const influencerStripeUserId = req.body.influencerStripeUserId;
+    const merchantStripeUserId = req.body.merchantStripeUserId;
+    console.log(req.body)
 
     Validator.shouldNotBeEmpty(email);
     Validator.shouldNotBeEmpty(tokenId);
     Validator.shouldNotBeEmpty(chargeAmount);
+    Validator.shouldNotBeEmpty(dealId);
+    Validator.shouldNotBeEmpty(influencerStripeUserId);
+    Validator.shouldNotBeEmpty(merchantStripeUserId);
 
     const options = { email, tokenId, chargeAmount };
     const context = { containerId, requestCount };
@@ -48,10 +55,10 @@ class PaymentController {
         customerId = customer.id;
 
         return stripe.charges.create({
-          description: `Charge for customer ${customerId}`,
+          description: `Charge for deal ${state.dealId}`,
           statement_descriptor: 'Circlus, Inc.',
           customer: customerId,
-          amount: Number((state.chargeAmount * 100).toFixed(2)),
+          amount: Number(state.chargeAmount.toFixed(2)) * 100,
           currency: 'usd',
           //destination: {
           //  // Send $80 to the seller after collecting a 20% platform fee.

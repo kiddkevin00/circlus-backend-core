@@ -28,6 +28,18 @@ class ProcessState {
     return this[stateContext].chargeAmount;
   }
 
+  get dealId() {
+    return this[stateContext].dealId;
+  }
+
+  get influencerStripeUserId() {
+    return this[stateContext].influencerStripeUserId;
+  }
+
+  get merchantStripeUserId() {
+    return this[stateContext].merchantStripeUserId;
+  }
+
   get authorizationCode() {
     return this[stateContext].authorizationCode;
   }
