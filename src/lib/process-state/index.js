@@ -10,6 +10,9 @@ class ProcessState {
     this[stateContext].tokenId = options.tokenId;
     this[stateContext].chargeAmount = options.chargeAmount;
     this[stateContext].authorizationCode = options.authorizationCode;
+    this[stateContext].dealId = options.dealId;
+    this[stateContext].influencerStripeUserId = options.influencerStripeUserId;
+    this[stateContext].merchantStripeUserId = options.merchantStripeUserId;
   }
 
   get context() {
