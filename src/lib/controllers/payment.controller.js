@@ -37,13 +37,15 @@ class PaymentController {
     Validator.shouldNotBeEmpty(influencerStripeUserId);
     Validator.shouldNotBeEmpty(merchantStripeUserId);
 
-    const options = { email, tokenId, chargeAmount };
+    const options = { email, tokenId, chargeAmount, dealId, influencerStripeUserId, merchantStripeUserId };
     const context = { containerId, requestCount };
     const state = ProcessSate.create(options, context);
     let customerId;
 
     return Promise
       .try(() => {
+
+        // create customer
         return stripe.customers.create({
           description: `Customer for ${state.email} - ${state.tokenId}`,
           account_balance: 0,
@@ -51,24 +53,42 @@ class PaymentController {
           source: state.tokenId,
         });
       })
-      .then((customer) => {
-        customerId = customer.id;
-
-        return stripe.charges.create({
-          description: `Charge for deal ${state.dealId}`,
-          statement_descriptor: 'Circlus, Inc.',
-          customer: customerId,
-          amount: Number(state.chargeAmount.toFixed(2)) * 100,
-          currency: 'usd',
-          //destination: {
-          //  // Send $80 to the seller after collecting a 20% platform fee.
-          //  amount: 8000,
-          //  // The destination of this charge is the seller's Stripe account.
-          //  account: SOME_ACCOUNT_ID,
-          //}
+      .then(customer => {
+         //charge customer
+          customerId = customer.id;
+          return stripe.charges.create({
+            description: `Charge for deal ${state.dealId}`,
+            statement_descriptor: 'Circlus, Inc.',
+            customer: customerId,
+            amount: Number(state.chargeAmount.toFixed(2)) * 100,
+            currency: 'usd',
+            transfer_group: `${state.dealId}`
         });
+
       })
-      .then(() => {
+      .then(charge => {
+
+         // transfer to seller and influencer
+          const merchantAmount = state.chargeAmount * 0.8;
+          const influencerAmount = state.chargeAmount * 0.08;
+          return Promise.all([
+            stripe.transfers.create({
+            amount: Number(merchantAmount.toFixed(2)) * 100,
+            currency: "usd",
+            transfer_group: `${state.dealId}`,
+            destination:  state.merchantStripeUserId,
+
+          }),
+          stripe.transfers.create({
+            amount: Number(influencerAmount.toFixed(2)) * 100,
+            currency: "usd",
+            transfer_group: `${state.dealId}`,
+            destination: state.influencerStripeUserId
+          })
+        ])
+       })
+      .then(transfer => {
+         console.log('ttttt', transfer)
         //const newJwtPayload = Object.assign({}, req.user, partialNewUserInfo, {
         //  sub: `${partialNewUserInfo.type}:${req.user.email}:${req.user._id}`,
         //});
