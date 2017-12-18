@@ -11,6 +11,7 @@ class ProcessState {
     this[stateContext].chargeAmount = options.chargeAmount;
     this[stateContext].authorizationCode = options.authorizationCode;
     this[stateContext].dealId = options.dealId;
+    this[stateContext].dealName = options.dealName;
     this[stateContext].influencerStripeUserId = options.influencerStripeUserId;
     this[stateContext].merchantStripeUserId = options.merchantStripeUserId;
   }
@@ -33,6 +34,10 @@ class ProcessState {
 
   get dealId() {
     return this[stateContext].dealId;
+  }
+
+  get dealName() {
+    return this[stateContext].dealName;
   }
 
   get influencerStripeUserId() {
